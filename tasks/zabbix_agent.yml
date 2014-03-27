@@ -1,0 +1,89 @@
+---
+
+- name : zabbix_agent | Update apt cache
+  apt :
+     update_cache="yes"
+
+- name: zabbix_agent | Install pre dependency 
+  apt:  
+     pkg="{{item}}"
+     state=present
+  with_items:
+     - python-pip
+     - libcurl3-gnutls
+     - update-notifier-common
+  tags: zabbix_agent
+
+- name: zabbix_agent | Add zabbix.com repository key
+  apt_key: 
+     url=http://repo.zabbix.com/zabbix-official-repo.key 
+     state=present
+  tags: zabbix_agent
+
+- name: zabbix_agent | Add zabbix.com repository
+  apt_repository:
+     repo="deb http://repo.zabbix.com/zabbix/{{zabbix_agent_major}}.{{zabbix_agent_minor}}/{{ansible_distribution|lower}} {{ansible_lsb.codename}} main contrib non-free"
+     state=present
+  tags: zabbix_agent
+
+- name : zabbix_agent | Update apt after adding repository
+  apt :
+     update_cache="yes"
+
+- name: zabbix_agent | Install Zabbix agent
+  apt: 
+     pkg="zabbix-agent={{zabbix_agent_ubuntu}}"
+     state=present
+  tags: zabbix_agent
+
+- name: zabbix_agent | Deploy zabbix_agentd.conf file
+  template: 
+     src="conf/zabbix_agentd.conf.j2"
+     dest="/etc/zabbix/zabbix_agentd.conf"
+     owner=root
+     group=root
+     mode=0644
+  tags: zabbix_agent
+  notify: restart zabbix_agent
+
+- name: zabbix_agent | Deploy Zabbix sudeors file
+  template: 
+     src=conf/zabbix-sudeors.j2 
+     dest=/etc/sudoers.d/zabbix-sudeors
+     owner=root
+     group=root
+     mode=0640
+     validate='visudo -cf %s'
+  register: zabbixSudo
+  tags: zabbix_agent 
+  notify: restart zabbix_agent
+
+- name: zabbix_agent | Deploy zabbix_agentd.d (Zabbix User parameters)
+  copy: 
+     src="{{item}}"
+     dest=/etc/zabbix/zabbix_agentd.d/
+     owner=root
+     group=root
+     mode=0644
+  with_fileglob: zabbix_agent_parameters_files
+  tags: zabbix_agent
+  notify: restart zabbix_agent
+
+- name: zabbix_agent | Create zabbix_custom_scripts Directory
+  file:
+     path=/etc/zabbix/zabbix_custom_scripts
+     owner=root
+     group=root
+     state=directory
+  tags: zabbix_agent
+
+- name: zabbix_agent | Copy custom scripts (discovery, ...)
+  copy: 
+     src="{{item}}"
+     dest=/etc/zabbix/zabbix_custom_scripts/
+     owner=root
+     group=root
+     mode=0755
+  with_fileglob: zabbix_agent_custom_scripts
+  tags: zabbix_agent
+  notify: restart zabbix_agent

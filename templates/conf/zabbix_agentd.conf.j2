@@ -53,7 +53,11 @@ DebugLevel={{zabbix_agent_DebugLevel}}
 #
 # Mandatory: no
 # Default:
+{% if zbx_agent_source_ip is defined%}
+SourceIP={{ zbx_agent_source_ip }}
+{% else %}
 # SourceIP=
+{% endif %}
 
 ### Option: EnableRemoteCommands
 #	Whether remote commands from Zabbix server are allowed.

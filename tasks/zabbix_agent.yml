@@ -10,7 +10,7 @@
      state=present
   with_items:
      - python-pip
-     - libcurl3-gnutls
+     - python-pycurl
      - update-notifier-common
   tags: zabbix_agent
 

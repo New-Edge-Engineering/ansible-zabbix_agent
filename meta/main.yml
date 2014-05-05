@@ -1,5 +1,6 @@
 galaxy_info:
-  author: Adham Helal
+  author: Matthew Green
+  company: New Edge Engineering
   description: "Deploy Zabbix agents for Ubuntu 12.04"
   min_ansible_version: 1.4
   platforms:

@@ -14,6 +14,14 @@
      - update-notifier-common
   tags: zabbix_agent
 
+- name: Zabbix Agent | Install supporting python packages
+  pip:
+    name: "{{ item }}"
+    state: present
+  sudo: yes
+  with_items:
+    - httplib2
+
 - name: Zabbix Agent | Add zabbix.com repository key
   apt_key:
      url=http://repo.zabbix.com/zabbix-official-repo.key
@@ -32,7 +40,7 @@
     - packages
 
 - name: Zabbix Agent | Find latest package name
-  shell: "echo '{{ rundeck_packages_info.content }}'  | grep -A 11 'Package\: zabbix-agent' | tail -n 1| awk '{print $2}'"
+  shell: "echo '{{ rundeck_packages_info.content }}'  | grep -A 11 \"Package: zabbix-agent\" | tail -n 1| awk '{print $2}'"
   register: rundeck_deb_package
   tags:
     - rundeck
@@ -40,7 +48,7 @@
     - packages
 
 - name: Zabbix Agent | Find latest package version
-  shell: "echo '{{ rundeck_packages_info.content }}'  | grep -A 2 'Package\: zabbix-agent' | tail -n 1| awk '{print $2}'"
+  shell: "echo '{{ rundeck_packages_info.content }}'  | grep -A 2 \"Package: zabbix-agent\" | tail -n 1| awk '{print $2}'"
   register: rundeck_targeting_version
   tags:
     - rundeck

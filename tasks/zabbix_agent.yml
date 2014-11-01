@@ -1,11 +1,11 @@
 ---
 
-- name : zabbix_agent | Update apt cache
+- name : Zabbix Agent | Ensure apt cache is up to date
   apt :
      update_cache="yes"
 
-- name: zabbix_agent | Install pre dependency 
-  apt:  
+- name: Zabbix Agent | Install pre dependency
+  apt:
      pkg="{{item}}"
      state=present
   with_items:
@@ -14,30 +14,57 @@
      - update-notifier-common
   tags: zabbix_agent
 
-- name: zabbix_agent | Add zabbix.com repository key
-  apt_key: 
-     url=http://repo.zabbix.com/zabbix-official-repo.key 
+- name: Zabbix Agent | Add zabbix.com repository key
+  apt_key:
+     url=http://repo.zabbix.com/zabbix-official-repo.key
      state=present
   tags: zabbix_agent
 
-- name: zabbix_agent | Add zabbix.com repository
+# Automatic discovery of the latest package to be installed.
+- name: Zabbix Agent | Get the latest package information
+  uri:
+    url: http://repo.zabbix.com/zabbix/{{zabbix_agent_major}}.{{zabbix_agent_minor}}/{{ansible_distribution|lower}}/dists/{{ansible_lsb.codename}}/main/binary-amd64/Packages
+    return_content: yes
+  register: rundeck_packages_info
+  tags:
+    - rundeck
+    - install
+    - packages
+
+- name: Zabbix Agent | Find latest package name
+  shell: "echo '{{ rundeck_packages_info.content }}'  | grep -A 11 'Package\: zabbix-agent' | tail -n 1| awk '{print $2}'"
+  register: rundeck_deb_package
+  tags:
+    - rundeck
+    - install
+    - packages
+
+- name: Zabbix Agent | Find latest package version
+  shell: "echo '{{ rundeck_packages_info.content }}'  | grep -A 2 'Package\: zabbix-agent' | tail -n 1| awk '{print $2}'"
+  register: rundeck_targeting_version
+  tags:
+    - rundeck
+    - install
+    - packages
+
+- name: Zabbix Agent | Add zabbix.com repository
   apt_repository:
      repo="deb http://repo.zabbix.com/zabbix/{{zabbix_agent_major}}.{{zabbix_agent_minor}}/{{ansible_distribution|lower}} {{ansible_lsb.codename}} main contrib non-free"
      state=present
   tags: zabbix_agent
 
-- name : zabbix_agent | Update apt after adding repository
+- name : Zabbix Agent | Update apt after adding repository
   apt :
      update_cache="yes"
 
-- name: zabbix_agent | Install Zabbix agent
-  apt: 
-     pkg="zabbix-agent={{zabbix_agent_ubuntu}}"
+- name: Zabbix Agent | Install Zabbix agent
+  apt:
+     pkg="zabbix-agent={{ rundeck_targeting_version.stdout }}"
      state=present
   tags: zabbix_agent
 
-- name: zabbix_agent | Deploy zabbix_agentd.conf file
-  template: 
+- name: Zabbix Agent | Deploy zabbix_agentd.conf file
+  template:
      src="conf/zabbix_agentd.conf.j2"
      dest="/etc/zabbix/zabbix_agentd.conf"
      owner=root

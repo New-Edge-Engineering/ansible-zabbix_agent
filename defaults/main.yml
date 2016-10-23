@@ -1,8 +1,4 @@
 ## Zabbix agent conf section
-### zabbix Agent version marjor.minor.revision
-zabbix_agent_major                : '2'
-zabbix_agent_minor                : '2'
-zabbix_agent_revision             : '4'
 zabbix_agent_Server               : "127.0.0.1"  ## List of comma delimited IP addresses (or hostnames) of Zabbix servers.
 zabbix_agent_ServerActive         : "127.0.0.1"
 zabbix_agent_Hostname             : "system.hostname"

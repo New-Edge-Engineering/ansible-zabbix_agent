@@ -1,0 +1,6 @@
+---
+# Constants
+### zabbix Agent version marjor.minor.revision
+zabbix_agent_major                : '2'
+zabbix_agent_minor                : '4'
+zabbix_agent_revision             : '0'

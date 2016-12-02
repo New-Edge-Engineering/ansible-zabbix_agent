@@ -2,6 +2,6 @@
 # This playbook play all post common installation for all servers
 
 - hosts: all
-  sudo: True
+  become: True
   roles:
     - ansible-zabbix_agent

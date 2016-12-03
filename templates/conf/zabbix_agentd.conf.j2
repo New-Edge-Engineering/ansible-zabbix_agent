@@ -175,6 +175,10 @@ Hostname={{zabbix_agent_Hostname}}
 # Default:
 # HostMetadata=
 
+{% if zabbix_agent_HostMetadata is defined %}
+HostMetadataItem={{ zabbix_agent_HostMetadata }}
+{% endif %}
+
 ### Option: HostMetadataItem
 #	Optional parameter that defines an item used for getting host metadata.
 #	Host metadata is used at host auto-registration process.
@@ -186,7 +190,9 @@ Hostname={{zabbix_agent_Hostname}}
 # Default:
 # HostMetadataItem=
 
+{% if zabbix_agent_HostMetadata is not defined %}
 HostMetadataItem=system.uname
+{% endif %}
 
 ### Option: RefreshActiveChecks
 #	How often list of active checks is refreshed, in seconds.

@@ -1,7 +1,7 @@
 ## Zabbix agent conf section
 zabbix_agent_Server               : "127.0.0.1"  ## List of comma delimited IP addresses (or hostnames) of Zabbix servers.
 zabbix_agent_ServerActive         : "127.0.0.1"
-zabbix_agent_Hostname             : None
+zabbix_agent_Hostname             :
 zabbix_agent_LogFile              : "/var/log/zabbix/zabbix_agentd.log"
 zabbix_agent_LogFileSize          : 0    ## 0 - disable automatic log rotation.
 zabbix_agent_DebugLevel           : 3    ## (0) no, (1) critical info (2) error info (3) warnings (4) A lots of infor)

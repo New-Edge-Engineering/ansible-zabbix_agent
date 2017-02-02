@@ -1,19 +1,19 @@
 ---
 
-- name: zabbix_agent | Deploy Zabbix sudeors file
-  template: 
-     src=conf/zabbix-sudeors.j2 
+- name: zabbix_scripts | Deploy Zabbix sudeors file
+  template:
+     src=conf/zabbix-sudeors.j2
      dest=/etc/sudoers.d/zabbix-sudeors
      owner=root
      group=root
      mode=0640
      validate='visudo -cf %s'
   register: zabbixSudo
-  tags: zabbix_agent 
+  tags: zabbix_agent
   notify: restart zabbix_agent
 
-- name: zabbix_agent | Copy User parameters file to zabbix_agentd.d
-  copy: 
+- name: zabbix_scripts | Copy User parameters file to zabbix_agentd.d
+  copy:
      src="{{item}}"
      dest=/etc/zabbix/zabbix_agentd.d/
      owner=root
@@ -23,18 +23,18 @@
   tags: zabbix_agent
   notify: restart zabbix_agent
 
-- name: zabbix_agent | Generate User parameters to zabbix_agentd.d
-  template: 
+- name: zabbix_scripts | Generate User parameters to zabbix_agentd.d
+  template:
      src="conf/userparam.j2"
      dest="/etc/zabbix/zabbix_agentd.d/userparameter_{{item.name}}.conf"
      owner=root
      group=root
      mode=0644
-  with_items: zabbix_agent_parameters
+  with_items: "{{zabbix_agent_parameters}}"
   tags: zabbix_agent
   notify: restart zabbix_agent
 
-- name: zabbix_agent | Create zabbix_custom_scripts Directory
+- name: zabbix_scripts | Create zabbix_custom_scripts Directory
   file:
      path="{{zabbix_agent_dir_custom}}"
      owner=root
@@ -42,22 +42,21 @@
      state=directory
   tags: zabbix_agent
 
-- name: zabbix_agent | Copy custom scripts (discovery, ...)
-  copy: 
+- name: zabbix_scripts | Copy custom scripts (discovery, ...)
+  copy:
      src="{{item}}"
      dest="{{zabbix_agent_dir_custom}}"
      owner=root
      group=root
      mode=0755
-  with_fileglob: 
+  with_fileglob:
      - "zabbix_custom_scripts/*"
   tags: zabbix_agent
   notify: restart zabbix_agent
 
-- name: zabbix_agent | apt package for custom scripts
+- name: zabbix_scripts | apt package for custom scripts
   apt:
     pkg={{item}}
-  with_items: zabbix_agent_custom_apt
+  with_items: "{{zabbix_agent_custom_apt}}"
   tags: zabbix_agent
   notify: restart zabbix_agent
-  
